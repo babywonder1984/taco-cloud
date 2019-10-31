@@ -1,0 +1,172 @@
+<!-- tag::all[] -->
+<!-- tag::head[] -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+ <!--      xmlns:th是thymeleaf的命名空间。当命名空间被定义在元素的开始标签中时，
+      所有带有相同前缀的子元素都会与同一个命名空间相关联。
+       注释： 用于标示命名空间的地址不会被解析器用于查找信息。其惟一的作用是赋予命名空间一个惟一的名称。 -->
+  <head>
+    <title>Taco Cloud</title>
+    <link rel="stylesheet" th:href="@{/styles.css}" />
+    
+<!-- Link URL Expressions: @{...} Absolute URLs: http://www.thymeleaf.org
+Relative URLs, which can be:Page-relative: user/login.html
+    
+    绝对路径 — http://example.com
+    相对路径        /somewhere_else" -->
+  </head>
+
+  <body>
+    <h1>Design your taco!</h1>
+
+
+
+    <form method="POST" th:object="${design}">
+<!--     Thymeleaf agrees with you, and that’s why th:attr is scarcely used in templates. 
+    Normally, you will be using other th:* attributes whose task is setting 
+    specific tag attributes (and not just any attribute like th:attr).
+
+     For example, to set the value attribute, use th:value:
+           上面的例子中请注意，form中如果没有action属性，则数据提交至请求相同的路径。另外th:object属性用于绑定命令对象，命令对象是SpringMVC给
+           表格后端beans的名称，也就是model.attribute("属性名"，属性值),每个表格中只能有一个th:object.
+                  
+7.1 Handling the command object
+
+Command object is the name Spring MVC gives to form-backing beans, 
+this is, to objects that model a form’s fields and provide getter and setter methods
+ that will be used by the framework for establishing and obtaining 
+ the values input by the user at the browser side.
+
+Thymeleaf requires you to specify the command object by using a 
+th:object attribute in your <form> tag:
+
+<form action="#" th:action="@{/seedstartermng}" th:object="${seedStarter}" method="post">
+    ...
+</form>
+
+This is consistent with other uses of th:object, but in fact this specific scenario 
+adds some limitations in order to correctly integrate with Spring MVC’s infrastructure:
+
+    Values for th:object attributes in form tags must be variable expressions 
+    (${...}) specifying only the name of a model attribute, without property navigation. 
+    This means that an expression like ${seedStarter} is valid, but ${seedStarter.data}
+     would not be.
+    Once inside the <form> tag, no other th:object attribute can be specified.
+     This is consistent with the fact that HTML forms cannot be nested.           
+            -->
+
+    <div class="grid">
+
+      <div class="ingredient-group" id="wraps">
+<!-- tag::designateWrap[] -->
+      <h3>Designate your wrap:</h3>
+      <div th:each="ingredient : ${wrap}">
+        <input name="ingredients" type="checkbox" th:value="${ingredient.id}" />
+        
+         
+        <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+        <!--         Variable Expressions: ${...}
+                       变量表达式：获取属性名及变量中的值,范围是全局的,与th:text属性配合使用，替换tag中的值。
+         
+        -->
+            
+      </div>
+<!-- end::designateWrap[] -->
+      </div>
+
+	  <div class="ingredient-group" id="proteins">
+      <h3>Pick your protein:</h3>
+      <div th:each="ingredient : ${protein}">
+        <input name="ingredients" type="checkbox" th:value="${ingredient.id}" />
+        
+       <!--  th:value表示为此tag的值，及checkbox的值 -->
+       
+        <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+      </div>
+      </div>
+
+	  <div class="ingredient-group" id="cheeses">
+      <h3>Choose your cheese:</h3>
+      <div th:each="ingredient : ${cheese}">
+      
+     <!--  thymeleaf th：each中的foreach语句 -->
+     
+        <input name="ingredients" type="checkbox" th:value="${ingredient.id}" />
+        <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+      </div>
+      </div>
+
+	  <div class="ingredient-group" id="veggies">
+      <h3>Determine your veggies:</h3>
+      <div th:each="ingredient : ${veggies}">
+        <input name="ingredients" type="checkbox" th:value="${ingredient.id}" />
+        <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+      </div>
+      </div>
+
+	  <div class="ingredient-group" id="sauces">
+      <h3>Select your sauce:</h3>
+      <div th:each="ingredient : ${sauce}">
+        <input name="ingredients" type="checkbox" th:value="${ingredient.id}" />
+        <span th:text="${ingredient.name}">INGREDIENT</span><br/>
+      </div>
+      </div>
+      </div>
+
+      <div>
+
+
+      <h3>Name your taco creation:</h3>
+      <input type="text" th:field="*{name}"/>
+       <!--             Selection Variable Expressions: *{...}
+                     选择变量表达式，是从命令对象范围中获取变量的值。
+           th:field主要负责输入，与 input tag配合使用，接收输入的值 。上例中，接收输入值赋值给变量name.
+           在input 中th:field="{*name}"等效于 =id=name=value
+   As you can see, we are introducing a new attribute here: th:field. 
+ This is a very important feature for Spring MVC integration 
+ because it does all the heavy work of binding your input with a property in the form-backing bean.
+ You can see it as an equivalent of the path attribute in a tag from Spring MVC’s JSP tag library.
+
+The th:field attribute behaves differently depending on whether it is attached to an <input>, 
+<select> or <textarea> tag (and also depending on the specific type of <input> tag). 
+In this case (input[type=text]), the above line of code is similar to:
+
+<input type="text" id="datePlanted" name="datePlanted" th:value="*{datePlanted}" />
+                      -->
+      
+ 
+    
+      <span class="validationError"
+            th:if="${#fields.hasErrors('name')}"
+            th:errors="*{name}">Name Error</span>
+
+            
+                <span class="validationError"
+          th:if="${#fields.hasErrors('ingredients')}"
+          th:errors="*{ingredients}">Ingredient Error</span>
+          
+<!--         关于验证，需要在 domain object中用注释标注，在controller中加入Errors接口参数，最后需要在view中使用
+th:if 与 th:errors,#fields输出。上例中name与ingredients都绑定到后到对象taco.
+th:if 判断字段表达式'ingredients'和'name'中是否有错误 ，th:errors中存储了错误数组。
+
+  Validation and Error Messages
+
+Most of our forms will need to show validation messages in order to inform
+ the user of the errors he/she has made.
+
+Thymeleaf offers some tools for this: a couple of functions in the #fields object,
+ the th:errors and the th:errorclass attributes. 
+ 
+ -->
+   
+      <br/>
+
+      <button>Submit your taco</button>
+      </div>
+<!-- tag::closeFormTag[] -->
+    </form>
+<!-- end::closeFormTag[] -->
+  </body>
+</html>
+<!-- end::all[] -->
