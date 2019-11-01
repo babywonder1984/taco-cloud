@@ -35,7 +35,22 @@ public class JdbcIngredientRepository implements IngredientRepository {
 		 */
 	}
 
-	
+
+	@Override
+	public Ingredient findOne(String id) {
+
+		return jdbc.queryForObject("select id , name ,type from Ingredient where id =?",this::rowMapper,id);
+	}
+
+	@Override
+	public Ingredient save(Ingredient ingredient) {
+
+		jdbc.update("insert into ingredient(id,name,type) values (?,?,?)",ingredient.getId(),
+				ingredient.getName(),ingredient.getType().toString());
+		return ingredient;
+	}
+
+
 	private Ingredient rowMapper(ResultSet rs , int rowNum) throws SQLException {
 		 return new Ingredient(rs.getString("id"),
 				 rs.getString("name"),
@@ -43,16 +58,6 @@ public class JdbcIngredientRepository implements IngredientRepository {
 				 
 	}
 	
-//	@Override
-//	public Ingredient findOne(String id) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public Ingredient save(Ingredient ingredient) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+
 
 }
